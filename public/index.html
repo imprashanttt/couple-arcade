@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Together — a room code and a game</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <span class="nav-mark">Together</span>
+</nav>
+
+<main id="screen-home" class="screen">
+  <section class="hero">
+    <h1 class="hero-title">
+      <span>Same room.</span>
+      <span>Your own game.</span>
+      <span class="accent">One chat.</span>
+    </h1>
+    <p class="hero-sub">Make a room, send the five-letter code. Play couple games together, or each play a different solo game while you chat and share photos and videos.</p>
+    <div class="hero-actions">
+      <button class="btn btn-primary" id="btn-create">Create a room</button>
+      <button class="btn btn-ghost" id="btn-join">Join with a code</button>
+    </div>
+  </section>
+
+  <section class="games">
+    <p class="section-label">What's inside every room</p>
+    <div class="games-row">
+      <button class="game-tile" type="button"><span class="game-tile-name">Couple games</span><span class="game-tile-note">Tic-Tac-Toe, Connect Four, Rock Paper Scissors</span></button>
+      <button class="game-tile" type="button"><span class="game-tile-name">Solo arcade</span><span class="game-tile-note">124 games. Each of you picks your own</span></button>
+      <button class="game-tile" type="button"><span class="game-tile-name">Live chat</span><span class="game-tile-note">Emoji, photos and videos</span></button>
+    </div>
+  </section>
+</main>
+
+<section id="screen-create" class="screen screen-panel hidden">
+  <button class="back-btn" data-back="home" type="button">Back</button>
+  <h2 class="panel-title">Start a room</h2>
+  <label class="field">
+    <span>Your name</span>
+    <input type="text" id="create-name" maxlength="20" placeholder="What should we call you?">
+  </label>
+  <button class="btn btn-primary" id="submit-create" type="button">Create room</button>
+</section>
+
+<section id="screen-join" class="screen screen-panel hidden">
+  <button class="back-btn" data-back="home" type="button">Back</button>
+  <h2 class="panel-title">Join a room</h2>
+  <label class="field">
+    <span>Your name</span>
+    <input type="text" id="join-name" maxlength="20" placeholder="What should we call you?">
+  </label>
+  <label class="field">
+    <span>Room code</span>
+    <input type="text" id="join-code" maxlength="5" placeholder="ABCDE">
+  </label>
+  <p class="field-error hidden" id="join-error"></p>
+  <button class="btn btn-primary" id="submit-join" type="button">Join room</button>
+</section>
+
+<section id="screen-waiting" class="screen screen-panel waiting hidden">
+  <p class="waiting-label">Send this code to them</p>
+  <div class="code-display" id="code-display">-----</div>
+  <button class="btn btn-ghost" id="copy-code" type="button">Copy code</button>
+  <p class="waiting-status">Waiting for your partner to join…</p>
+  <button class="back-btn" data-reload type="button">Cancel</button>
+</section>
+
+<section id="screen-game" class="screen hidden">
+  <div class="room-layout">
+    <div class="room-main">
+      <div class="room-top">
+        <span class="room-pill" id="room-pill"></span>
+        <div class="tabs" role="tablist">
+          <button class="tab active" data-tab="couple" type="button">Couple games</button>
+          <button class="tab" data-tab="solo" type="button">Solo arcade</button>
+        </div>
+        <button class="back-btn" id="btn-leave" type="button">Leave</button>
+      </div>
+
+      <div class="challenge hidden" id="challenge-box">
+        <span id="challenge-text"></span>
+        <form id="score-form" class="hidden">
+          <input type="number" id="score-input" step="any" placeholder="Your score" required>
+          <button class="btn btn-primary btn-sm" type="submit">Submit</button>
+        </form>
+        <button class="back-btn" id="challenge-cancel" type="button">Cancel</button>
+      </div>
+      <div class="scoreboard hidden" id="scoreboard"></div>
+
+      <div class="presence hidden" id="presence">
+        <span id="presence-text"></span>
+        <button class="btn btn-ghost btn-sm hidden" id="presence-join" type="button">Play it too</button>
+      </div>
+
+      <div id="pane-couple">
+        <div id="couple-pick">
+          <p class="section-label">Pick a game for both of you</p>
+          <div class="pick-grid">
+            <button class="game-tile" data-game="tictactoe" type="button"><span class="game-tile-name">Tic-Tac-Toe</span><span class="game-tile-note">Three in a row wins it</span></button>
+            <button class="game-tile" data-game="connect4" type="button"><span class="game-tile-name">Connect Four</span><span class="game-tile-note">Drop pieces, line up four</span></button>
+            <button class="game-tile" data-game="rps" type="button"><span class="game-tile-name">Rock Paper Scissors</span><span class="game-tile-note">Best of five rounds</span></button>
+          </div>
+        </div>
+        <div id="couple-play" class="hidden">
+          <div class="game-header">
+            <span id="game-title"></span>
+            <button class="back-btn" id="btn-change-game" type="button">Change game</button>
+          </div>
+          <div class="board-wrap" id="board-wrap"></div>
+          <p class="game-status" id="game-status"></p>
+          <div class="game-actions hidden" id="game-actions">
+            <button class="btn btn-primary" id="btn-rematch" type="button">Play again</button>
+            <button class="btn btn-ghost" id="btn-other-game" type="button">Pick another game</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="pane-solo" class="hidden">
+        <div id="solo-browse">
+          <p class="section-label">Each of you can play a different game. Your partner sees what you picked.</p>
+          <input type="search" id="solo-search" class="solo-search" placeholder="Search 124 games" autocomplete="off">
+          <div class="chips" id="solo-chips"></div>
+          <div class="solo-grid" id="solo-grid"></div>
+        </div>
+        <div id="solo-play" class="hidden">
+          <div class="game-header">
+            <button class="back-btn" id="solo-back" type="button">All games</button>
+            <span id="solo-title"></span>
+            <div class="challenge-ctl">
+              <select id="ch-min" aria-label="Minutes"><option value="1">1 min</option><option value="3" selected>3 min</option><option value="5">5 min</option><option value="10">10 min</option></select>
+              <label class="ch-lower"><input type="checkbox" id="ch-lower"> lower wins</label>
+              <button class="btn btn-ghost btn-sm" id="btn-challenge" type="button">Challenge partner</button>
+            </div>
+          </div>
+          <div class="frame-wrap"><iframe id="solo-frame" title="Solo game" allow="fullscreen; autoplay; gamepad" allowfullscreen></iframe></div>
+          <p class="solo-note">Games run inside this page. If one looks stuck, go back and open it again.</p>
+        </div>
+      </div>
+    </div>
+
+    <aside class="chat-panel">
+      <div class="chat-log" id="chat-log"></div>
+      <div class="emoji-row" id="emoji-row"></div>
+      <form id="chat-form" class="chat-form">
+        <button type="button" class="attach-btn" id="attach-btn" title="Send a photo or video" aria-label="Send a photo or video">+</button>
+        <input type="file" id="attach-input" accept="image/*,video/*" hidden>
+        <input type="text" id="chat-input" maxlength="200" placeholder="Say something" autocomplete="off">
+        <button type="submit" class="send-btn">Send</button>
+      </form>
+    </aside>
+  </div>
+</section>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/games.js"></script>
+<script src="/app.js"></script>
+</body>
+</html>
